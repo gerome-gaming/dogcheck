@@ -1,34 +1,42 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-  <meta charset='utf-8'>
-  <meta name='viewport' content='width=device-width'>
-  <meta name='theme-color' content='#000000'>
-  <meta name='robots' content='noindex'>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
   <title>room_dogcheck</title>
-  <base href="https://gerome-gaming.github.io/dogcheck/">
-  <link href='assets/css/extra.css' rel='stylesheet' type='text/css'>
+
+  <!-- INLINE CSS (formerly extra.css) -->
   <style>
     html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      background: #000;
-      height: 100%;
-      width: 100%;
+      background-color: black;
+      color: #fff;
+      font-family: "8bitOperatorPlus-Bold", monospace;
     }
 
-    main {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      width: 100%;
+    @font-face {
+      font-family: '8bitOperatorPlus-Bold';
+      src: url("assets/fonts/8bitOperatorPlus-Bold.woff") format("woff");
+    }
+
+    @font-face {
+      font-family: '8bitOperatorPlus-Regular';
+      src: url("assets/fonts/8bitOperatorPlus-Regular.woff") format("woff");
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     #center {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .dog {
@@ -37,7 +45,6 @@
       min-height: 320px;
       max-height: 100%;
       position: relative;
-      color: black;
       cursor: pointer;
     }
 
@@ -52,73 +59,57 @@
     .dog2 {
       opacity: 0;
     }
-
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <main>
-    <script crossorigin='anonymous' integrity='sha512-yBpuflZmP5lwMzZ03hiCLzA94N0K2vgBtJgqQ2E1meJzmIBfjbb7k4Y23k2i2c/rIeSUGc7jojyIY5waK3ZxCQ==' referrerpolicy='no-referrer' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.slim.min.js'></script>
-    <script crossorigin='anonymous' integrity='sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==' referrerpolicy='no-referrer' src='https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js'></script>
-
-    <div id='center'>
-      <div class='dog' id='dog_sleep'>
-        <img alt='Sleeping dog' class='dog1' src='assets/images/dog-sleep.png'>
-        <img alt='Sleeping dog' class='dog2' src='assets/images/dog-sleep.gif'>
-      </div>
-      <div class='dog hidden' id='dog_maraca'>
-        <img alt='Maraca dog' class='dog1' src='assets/images/dog-maraca.png'>
-        <img alt='Maraca dog' class='dog2' src='assets/images/dog-maraca.gif'>
-      </div>
+  <div id="center">
+    <div class="dog" id="dog_sleep">
+      <img alt="Sleeping dog" class="dog1" src="assets/images/dog-sleep.png" />
+      <img alt="Sleeping dog" class="dog2" src="assets/images/dog-sleep.gif" />
     </div>
+    <div class="dog hidden" id="dog_maraca">
+      <img alt="Maraca dog" class="dog1" src="assets/images/dog-maraca.png" />
+      <img alt="Maraca dog" class="dog2" src="assets/images/dog-maraca.gif" />
+    </div>
+  </div>
 
-    <script>
-      var maraca = false;
+  <!-- INLINE SCRIPT (no CDN) -->
+  <script>
+    let maraca = false;
+    if (Math.random() >= 0.95) {
+      document.getElementById('dog_sleep').classList.add('hidden');
+      document.getElementById('dog_maraca').classList.remove('hidden');
+      maraca = true;
+    }
 
-      var results = new Howl({
-        src: ['assets/audio/results.ogg', 'assets/audio/results.mp3'],
-        volume: 0.5,
-        loop: true
-      });
+    function playSound(sound) {
+      let audio = new Audio(sound);
+      audio.loop = true;
+      audio.volume = 0.5;
+      audio.play();
+      return audio;
+    }
 
-      var baci = new Howl({
-        src: ['assets/audio/baci_perugina2.ogg', 'assets/audio/baci_perugina2.mp3'],
-        volume: 0.5,
-        loop: true
-      });
+    let currentAudio = null;
 
-      $(function () {
-        if (Math.random() >= 0.95) {
-          $('#dog_sleep').addClass('hidden');
-          $('#dog_maraca').removeClass('hidden');
-          maraca = true;
-        }
-      });
-
-      $(document).on('click', '.dog:not(.playing)', function () {
-        if (maraca) {
-          baci.play();
+    document.querySelectorAll('.dog').forEach(dog => {
+      dog.addEventListener('click', () => {
+        let playing = dog.classList.contains('playing');
+        if (playing) {
+          if (currentAudio) currentAudio.pause();
+          dog.classList.remove('playing');
+          document.querySelectorAll('.dog1').forEach(el => el.style.opacity = 1);
+          document.querySelectorAll('.dog2').forEach(el => el.style.opacity = 0);
         } else {
-          results.play();
+          currentAudio = playSound(
+            maraca ? 'assets/audio/baci_perugina2.mp3' : 'assets/audio/results.mp3'
+          );
+          dog.classList.add('playing');
+          document.querySelectorAll('.dog1').forEach(el => el.style.opacity = 0);
+          document.querySelectorAll('.dog2').forEach(el => el.style.opacity = 1);
         }
-        $('.dog').addClass('playing');
-        $('.dog1').css('opacity', 0);
-        $('.dog2').css('opacity', 1);
       });
-
-      $(document).on('click', '.dog.playing', function () {
-        if (maraca) {
-          baci.pause();
-        } else {
-          results.pause();
-        }
-        $('.dog').removeClass('playing');
-        $('.dog1').css('opacity', 1);
-        $('.dog2').css('opacity', 0);
-      });
-    </script>
-  </main>
+    });
+  </script>
 </body>
 </html>
