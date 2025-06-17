@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>room_dogcheck</title>
+  <link href="/assets/css/extra.css" rel="stylesheet" type="text/css">
+  <style>
+    .dog {
+      min-width: 320px;
+      max-width: 100%;
+      min-height: 320px;
+      max-height: 100%;
+      position: relative;
+      color: black;
+      cursor: pointer;
+    }
+    .dog img {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .dog2 {
+      opacity: 0;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="center">
+      <div class="dog" id="dog_sleep">
+        <img alt="Sleeping dog" class="dog1" src="/assets/images/dog-sleep.png">
+        <img alt="Sleeping dog" class="dog2" src="/assets/images/dog-sleep.gif">
+      </div>
+      <div class="dog hidden" id="dog_maraca">
+        <img alt="Maraca dog" class="dog1" src="/assets/images/dog-maraca.png">
+        <img alt="Maraca dog" class="dog2" src="/assets/images/dog-maraca.gif">
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script>
+      var maraca = false;
+
+      var results = new Howl({
+        src: ['/assets/audio/results.ogg', '/assets/audio/results.mp3'],
+        volume: 0.5,
+        loop: true
+      });
+
+      var baci = new Howl({
+        src: ['/assets/audio/baci_perugina2.ogg', '/assets/audio/baci_perugina2.mp3'],
+        volume: 0.5,
+        loop: true
+      });
+
+      $(function () {
+        if (Math.random() >= 0.95) {
+          $('#dog_sleep').addClass('hidden');
+          $('#dog_maraca').removeClass('hidden');
+          maraca = true;
+        }
+      });
+
+      $(document).on('click', '.dog:not(.playing)', function () {
+        if (maraca) {
+          baci.play();
+        } else {
+          results.play();
+        }
+        $('.dog').addClass('playing');
+        $('.dog1').css('opacity', 0);
+        $('.dog2').css('opacity', 1);
+      });
+
+      $(document).on('click', '.dog.playing', function () {
+        if (maraca) {
+          baci.pause();
+        } else {
+          results.pause();
+        }
+        $('.dog').removeClass('playing');
+        $('.dog1').css('opacity', 1);
+        $('.dog2').css('opacity', 0);
+      });
+    </script>
+  </main>
+</body>
+</html>
